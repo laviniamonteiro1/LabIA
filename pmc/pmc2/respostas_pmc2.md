@@ -32,3 +32,14 @@ Foi implementada a rotina de pós-processamento utilizando o critério de **arre
 - **Conjunto de Teste:** 18 padrões aplicados.
 - **Taxa de Acerto Final:** **100.00%**.
 - **Conclusão:** A rede classificou corretamente todos os conservantes (Tipos A, B e C) após o treinamento.
+
+---
+
+### 5. Análise Teórica: Convergência em Superfícies de Erro Complexas
+Diferentemente de arquiteturas lineares como o Adaline ou redes RBF (que possuem superfícies de erro estritamente convexas e com um único mínimo global garantido), o Perceptron Multicamadas (PMC) opera sobre uma **superfície de erro não-convexa e de alta complexidade topológica**.
+
+A inserção de múltiplas camadas ocultas combinadas com funções de ativação não-lineares (sigmoides) transforma o cálculo do custo do Backpropagation em um terreno irregular e caótico. Em vez de uma descida limpa em direção a um único centro, o algoritmo enfrenta:
+1. **Múltiplos Mínimos Locais:** "Vales" falsos onde o gradiente se anula ($\nabla E = 0$), fazendo com que a rede possa estacionar em soluções sub-ótimas se inicializada em uma coordenada desfavorável.
+2. **Pontos de Sela e Platôs:** Extensas regiões planas onde as derivadas da sigmoide aproximam-se de zero (fenômeno da saturação do neurônio), tornando o ajuste dos pesos extremamente lento.
+
+Essa complexidade topográfica justifica a expressiva diferença de desempenho observada nos testes deste relatório. Enquanto o Backpropagation Padrão tendeu a gastar **1034 épocas** para contornar essas irregularidades da superfície, a incorporação do **Termo de Momento ($\alpha = 0.9$)** funcionou como uma força de inércia mecânica. Ao acumular a energia dos gradientes passados, o Momentum permitiu que a rede superasse os pequenos obstáculos e platôs intermediários do problema dos conservantes, acelerando a descida e atingindo o ponto ótimo global em apenas **265 épocas**.
