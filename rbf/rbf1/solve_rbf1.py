@@ -1,4 +1,4 @@
-# 19/05 - Script de Execução e Validação - RBF 01
+# 19/05 - Script de Execução e Validação - RBF 01 (Atualizado)
 import numpy as np
 from dados_rbf1 import X_treino, D_treino, X_kmeans_filtro, X_teste, D_teste
 from rbf1 import RBFNet
@@ -16,7 +16,8 @@ def executar_experimento():
         print(f"Cluster {i+1}: Centro = {centros[i]}, Variância = {variancias[i]:.6f}")
         
     print("\n=== ETAPA 2: Treinamento da Camada de Saída (Regra Delta) ===")
-    print("Treinando com eta = 0.01 e precisão = 10^-7... Por favor, aguarde.")
+    # Ajustado o texto para refletir o critério de parada por variação de erro (Delta EQM)
+    print("Treinando com eta = 0.01 e precisão de variação (Δ EQM) = 10^-7... Por favor, aguarde.")
     # Executa a otimização dos pesos lineares de saída
     total_epocas, pesos_finais = rbf_net.train_output_layer(X_treino, D_treino, eta=0.01, precision=1e-7)
     

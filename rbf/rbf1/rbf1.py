@@ -57,7 +57,8 @@ class RBFNet:
     def train_output_layer(self, X_train, D_train, eta=0.01, precision=1e-7, max_epochs=50000):
         """
         Treina a camada de saída utilizando a Regra Delta Generalizada.
-        Adicionado o parâmetro max_epochs para evitar loop infinito devido à estagnação matemática em mínimos locais.
+        Critério de parada corrigido para avaliar a variação infinitesimal do EQM (Δ EQM) 
+        entre épocas consecutivas, evitando loops infinitos em platôs de erro residual.
         """
         n_samples = X_train.shape[0]
         H = self.compute_hidden_activations(X_train)
@@ -66,10 +67,11 @@ class RBFNet:
         self.W = np.zeros((self.n_clusters + 1, 1))
         
         epochs = 0
-        eqm = 1.0
+        eqm_atual = 1.0
+        diff_eqm = 1.0  # Guarda a variação absoluta do erro entre as épocas (Delta)
         
-        # O loop agora para por precisão OU por limite de segurança de épocas
-        while eqm > precision and epochs < max_epochs:
+        # O loop agora monitora se a taxa de aprendizado estagnou abaixo da precisão desejada
+        while diff_eqm > precision and epochs < max_epochs:
             error_sum = 0
             
             for i in range(n_samples):
@@ -85,12 +87,18 @@ class RBFNet:
                 # Atualização do peso (Regra Delta)
                 self.W += eta * error * h
 
-            eqm = error_sum / (2 * n_samples)
+            eqm_novo = error_sum / (2 * n_samples)
+            
+            # A partir da segunda época, calcula a variação real do aprendizado
+            if epochs > 0:
+                diff_eqm = abs(eqm_novo - eqm_atual)
+            
+            eqm_atual = eqm_novo
             epochs += 1
             
-            # Print mais inteligente: avisa a cada 10.000 épocas
+            # Print inteligente adaptado para monitorar o comportamento do Delta (variação)
             if epochs % 10000 == 0:
-                print(f"Época {epochs:5d} | EQM RBF Estacionado em: {eqm[0]:.8f}")
+                print(f"Época {epochs:5d} | EQM RBF: {eqm_atual:.8f} | Variação (Δ): {diff_eqm:.10f}")
                 
         return epochs, self.W
 

@@ -27,15 +27,15 @@ O algoritmo *k-means* foi aplicado exclusivamente sobre as amostras da base de t
 **Após o treinamento da camada intermediária execute o treinamento da camada de saída usando a regra delta generalizada. Utilize uma taxa de aprendizado $\eta = 0.01$ e precisão de $\epsilon = 10^{-7}$. No final da convergência forneça os valores dos pesos referente ao neurônio da camada de saída.**
 
 #### **Resposta 2:**
-A camada de saída foi otimizada utilizando o gradiente descendente linear (Regra Delta). Devido ao posicionamento fixo dos centros gaussianos (mapeados apenas na classe $d=1$), a rede encontrou uma barreira matemática intransponível para a separação total, travando o Erro Quadrático Médio (EQM) em **`0.11853805`**. 
+A camada de saída foi otimizada utilizando o algoritmo da Regra Delta com o critério de parada corrigido para monitorar a variação do erro quadrado médio entre as épocas ($\Delta \text{EQM} < 10^{-7}$). 
 
-Visando extrair os melhores pesos possíveis desse ponto de estagnação sem gerar loops infinitos, foi aplicado um limite de 50.000 épocas. Os valores finais dos pesos obtidos foram:
+Graças a essa implementação, a rede identificou o platô de estagnação matemática da arquitetura (causado pelo mapeamento restrito dos centros) e encerrou o processo de forma eficiente ao atingir a convergência com apenas **328 épocas**, eliminando o processamento redundante. Os valores finais dos pesos obtidos foram:
 
 | Peso | Valor Final |
 | :--- | :--- |
-| **$W_{21,0}$ (Bias)** | `-1.004369` |
-| **$W_{21,1}$ (Cluster 1)** | `2.385067` |
-| **$W_{21,2}$ (Cluster 2)** | `2.700635` |
+| **$W_{21,0}$ (Bias)** | `-1.001838` |
+| **$W_{21,1}$ (Cluster 1)** | `2.374704` |
+| **$W_{21,2}$ (Cluster 2)** | `2.696316` |
 
 ---
 
@@ -43,7 +43,7 @@ Visando extrair os melhores pesos possíveis desse ponto de estagnação sem ger
 **Dado que o problema se configura como um típico processo de classificação de padrões, implemente a rotina que faz o pós-processamento das saídas fornecidas pela rede (números reais) para números inteiros. Utilize a função sinal, ou seja, função utilizada apenas no pós-processamento do conjunto de teste.**
 
 #### **Resposta 3:**
-A rotina de pós-processamento foi desenvolvida de forma isolada para atuar apenas na etapa de teste. Ela mapeia as respostas contínuas ($y \in \mathbb{R}$) geradas pela saída da RBF em valores discretos e inteiros ($-1$ ou $1$) usando a função sinal matemática como critério de corte:
+A rotina de pós-processamento foi desenvolvida de forma isolada para atuar apenas na etapa de teste. Ela mapeia as respostas contínuas ($y \in \mathbb{R}$) geradas pela saída da RBF in valores discretos e inteiros ($-1$ ou $1$) usando a função sinal matemática como critério de corte:
 
 $$y_{\text{pós}} = \text{sgn}(y) = \begin{cases} 1, & \text{se } y \ge 0 \\ -1, & \text{se } y < 0 \end{cases}$$
 
@@ -55,20 +55,20 @@ O código que executa essa operação no script foi padronizado utilizando a fun
 **Faça a validação da rede aplicando o conjunto de teste fornecido na tabela abaixo. Forneça a taxa de acerto (%) entre os valores desejados e os valores fornecidos pela rede (após o pós-processamento) em relação a todos os padrões de teste.**
 
 #### **Resposta 4:**
-A validação do modelo foi realizada aplicando as 10 amostras inéditas separadas para o teste. O comportamento da rede mapeado amostra por amostra foi o seguinte:
+A validação do modelo foi realizada aplicando as 10 amostras inéditas separadas para o teste. O comportamento real observado no console após a convergência otimizada foi:
 
 | Amostra | $x_1$ | $x_2$ | Desejado ($d$) | Saída Real ($y$) | Saída Pós ($y_{\text{pós}}$) | Status |
 | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **1** | 0.8705 | 0.9329 | -1 | -1.0042 | -1 | **Acerto** |
-| **2** | 0.0388 | 0.2703 | 1 | -0.3236 | -1 | *Erro* |
-| **3** | 0.8236 | 0.4458 | -1 | -0.9156 | -1 | **Acerto** |
-| **4** | 0.7075 | 0.1502 | 1 | -0.2209 | -1 | *Erro* |
-| **5** | 0.9587 | 0.8663 | -1 | -1.0043 | -1 | **Acerto** |
-| **6** | 0.6115 | 0.9365 | -1 | -0.9894 | -1 | **Acerto** |
-| **7** | 0.3534 | 0.3646 | 1 | 0.9678 | 1 | **Acerto** |
-| **8** | 0.3268 | 0.2766 | 1 | 1.3244 | 1 | **Acerto** |
-| **9** | 0.6129 | 0.4518 | -1 | -0.4692 | -1 | **Acerto** |
-| **10** | 0.9948 | 0.4962 | -1 | -0.9984 | -1 | **Acerto** |
+| **1** | 0.8705 | 0.9329 | -1 | -1.0017 | -1 | **Acerto** |
+| **2** | 0.0388 | 0.2703 | 1 | -0.3229 | -1 | *Erro* |
+| **3** | 0.8236 | 0.4458 | -1 | -0.9133 | -1 | **Acerto** |
+| **4** | 0.7075 | 0.1502 | 1 | -0.2197 | -1 | *Erro* |
+| **5** | 0.9587 | 0.8663 | -1 | -1.0018 | -1 | **Acerto** |
+| **6** | 0.6115 | 0.9365 | -1 | -0.9870 | -1 | **Acerto** |
+| **7** | 0.3534 | 0.3646 | 1 | 0.9659 | 1 | **Acerto** |
+| **8** | 0.3268 | 0.2766 | 1 | 1.3226 | 1 | **Acerto** |
+| **9** | 0.6129 | 0.4518 | -1 | -0.4677 | -1 | **Acerto** |
+| **10** | 0.9948 | 0.4962 | -1 | -0.9958 | -1 | **Acerto** |
 
 **Taxa de Acerto Final (%):** **80.00%** (8 acertos em 10 padrões).
 
@@ -78,7 +78,7 @@ A validação do modelo foi realizada aplicando as 10 amostras inéditas separad
 **Se for o caso, explique quais estratégias poderemos adotar para tentar aumentar a taxa de acerto desta RBF.**
 
 #### **Resposta 5:**
-O erro de classificação observado nas amostras 2 e 4 do teste, bem como a impossibilidade do EQM de treino atingir o limite de $10^{-7}$, decorrem diretamente da restrição imposta à camada intermediária. Calcular centros de cluster olhando exclusivamente para dados da classe de radiação ($d=1$) impede que os neurônios gaussianos capturem o comportamento estatístico, a dispersão e as fronteiras da classe de ausência de radiação ($d=-1$).
+O erro de classificação observado nas amostras 2 e 4 do teste, bem como a impossibilidade do EQM de treino atingir o zero absoluto, decorrem diretamente da restrição imposta à camada intermediária. Calcular centros de cluster olhando exclusivamente para dados da classe de radiação ($d=1$) impede que os neurônios gaussianos capturem o comportamento estatístico, a dispersão e as fronteiras da classe de ausência de radiação ($d=-1$).
 
 Para solucionar essa deficiência e buscar uma taxa de acerto de até 100%, recomendam-se as seguintes melhorias na arquitetura:
 

@@ -1,4 +1,4 @@
-# 19/05 - Estrutura da Rede RBF - Atividade 2 (Aproximação Funcional)
+# 19/05 - Estrutura da Rede RBF - Atividade 2 (Aproximação Funcional) - Corrigido
 import numpy as np
 
 class RBFNetDynamic:
@@ -69,6 +69,8 @@ class RBFNetDynamic:
         """
         Treina a camada de saída linear usando a Regra Delta Generalizada.
         Inicialização obrigatória com valores aleatórios entre 0 e 1.
+        Critério de parada corrigido para avaliar a variação infinitesimal do EQM (Δ EQM)
+        entre épocas consecutivas, evitando loops infinitos em platôs de erro residual.
         """
         if seed is not None:
             np.random.seed(seed) # Garante matrizes iniciais estritamente diferentes por treino
@@ -80,11 +82,12 @@ class RBFNetDynamic:
         self.W = np.random.rand(self.n_clusters + 1, 1)
         
         epochs = 0
-        eqm = 1.0
+        eqm_atual = 1.0
+        diff_eqm = 1.0  # Guarda a variação absoluta do erro entre as épocas (Delta)
         eqm_history = []
         
-        # Loop de otimização linear com teto de segurança contra loop infinito
-        while eqm > precision and epochs < max_epochs:
+        # O loop agora monitora se a taxa de aprendizado estagnou abaixo da precisão desejada
+        while diff_eqm > precision and epochs < max_epochs:
             error_sum = 0
             
             for i in range(n_samples):
@@ -100,11 +103,17 @@ class RBFNetDynamic:
                 # Ajuste linear dos pesos (Regra Delta)
                 self.W += eta * error * h
 
-            eqm = error_sum / (2 * n_samples)
-            eqm_history.append(eqm)
+            eqm_novo = error_sum / (2 * n_samples)
+            eqm_history.append(eqm_novo)
+            
+            # A partir da segunda época, calcula a variação real do aprendizado
+            if epochs > 0:
+                diff_eqm = abs(eqm_novo - eqm_atual)
+                
+            eqm_atual = eqm_novo
             epochs += 1
             
-        return epochs, eqm, eqm_history
+        return epochs, eqm_atual, eqm_history
 
     def predict(self, X):
         """Realiza a inferência contínua (sem pós-processamento de sinal)."""

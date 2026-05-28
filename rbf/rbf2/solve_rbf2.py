@@ -43,14 +43,16 @@ def executar_bateria_rbf2():
             # Etapa 1: K-means
             net.train_hidden_layer(X_treino)
             
-            # Etapa 2: Regra Delta com taxa=0.01 e precisão=10^-7
+            # Etapa 2: Regra Delta com taxa=0.01 e precisão de variação=10^-7
             epocas, eqm_final, historico_eqm = net.train_output_layer(
                 X_treino, D_treino, eta=0.01, precision=1e-7, seed=semente_aleatoria
             )
             
-            # Armazena os dados para a primeira tabela macro
-            tabela_treino[nome].append({'epocas': epocas, 'eqm': eqm_final[0]})
-            print(f"  > Treinamento T{t_idx}: Finalizado em {epocas} épocas | EQM Final: {eqm_final[0]:.7f}")
+            # Converte o array do NumPy para float nativo do Python
+            eqm_final = float(eqm_final)
+            
+            tabela_treino[nome].append({'epocas': epocas, 'eqm': eqm_final})
+            print(f"  > Treinamento T{t_idx}: Finalizado em {epocas} épocas | EQM Final: {eqm_final:.7f}")
             
             # Validação no conjunto de teste
             y_pred = net.predict(X_teste).flatten()
@@ -69,9 +71,8 @@ def executar_bateria_rbf2():
             for idx_amostra in range(15):
                 predicoes_teste[idx_amostra + 1][f"{nome}_T{t_idx}"] = y_pred[idx_amostra]
             
-            # Verifica se este foi o melhor treinamento executado para salvar o gráfico
-            if eqm_final[0] < melhor_eqm_treino:
-                melhor_eqm_treino = eqm_final[0]
+            if eqm_final < melhor_eqm_treino:
+                melhor_eqm_treino = eqm_final
                 melhor_hist = historico_eqm
                 melhor_t_idx = t_idx
                 
@@ -95,7 +96,7 @@ def executar_bateria_rbf2():
     print("\n\nTABELA 2: Mapeamento e Validação (Conjunto de Teste)")
     print("Amostra | Desejado (d) | R1_T1  | R1_T2  | R1_T3  | R2_T1  | R2_T2  | R2_T3  | R3_T1  | R3_T2  | R3_T3  ")
     print("-"*110)
-    for am in sorted(predicoes_teste.keys()): # Corrigido aqui: "in" ao invés de "inside"
+    for am in sorted(predicoes_teste.keys()):
         d_val = D_teste[am-1][0]
         p = predicoes_teste[am]
         print(f"   {am:02d}   |    {d_val:.4f}    | {p['Rede 1_T1']:.4f} | {p['Rede 1_T2']:.4f} | {p['Rede 1_T3']:.4f} | {p['Rede 2_T1']:.4f} | {p['Rede 2_T2']:.4f} | {p['Rede 2_T3']:.4f} | {p['Rede 3_T1']:.4f} | {p['Rede 3_T2']:.4f} | {p['Rede 3_T3']:.4f}")
@@ -124,7 +125,7 @@ def executar_bateria_rbf2():
     
     # Salva a imagem na mesma pasta de execução
     plt.savefig("convergencia_rbf2.png", dpi=300)
-    print("\n\n[OK] Gráfico comparativo gerado e saved como 'convergencia_rbf2.png' na pasta.")
+    print("\n\n[OK] Gráfico comparativo gerado e salvo como 'convergencia_rbf2.png' na pasta.")
     plt.show()
 
 if __name__ == "__main__":
