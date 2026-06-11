@@ -1,0 +1,26 @@
+import csv
+
+# Dados da tabela de situações do processo industrial (10 situações, 16 variáveis)
+dados_art = [
+    [1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1],
+    [2, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0],
+    [3, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1],
+    [4, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0],
+    [5, 0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 1],
+    [6, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1],
+    [7, 1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0],
+    [8, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1],
+    [9, 0, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1],
+    [10, 0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 1]
+]
+
+with open("treinamento.csv", mode="w", newline="") as f:
+    writer = csv.writer(f)
+    # Cabeçalho: identificador da situação + as 16 variáveis (x1 até x16)
+    cabecalho = ["situacao"] + [f"x{i}" for i in range(1, 17)]
+    writer.writerow(cabecalho)
+    
+    for row in dados_art:
+        writer.writerow(row)
+
+print("[OK] Arquivo 'treinamento.csv' gerado com sucesso com as 10 situações industriais!")
